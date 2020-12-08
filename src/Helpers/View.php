@@ -25,7 +25,8 @@ class View
         if (!empty($data)) {
             extract($data);
         }
-        return include $pathView;
+        include $pathView;
+        die();
     }
 
 
