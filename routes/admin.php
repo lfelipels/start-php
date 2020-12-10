@@ -2,4 +2,5 @@
 
 use App\Controllers\Post;
 
-$app->get('/posts', Post::class . ':index');
+$app->get('/admin/posts', Post::class . ':index');
+$app->post('/admin/posts', Post::class . ':store');
