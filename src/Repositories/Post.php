@@ -17,7 +17,15 @@ class Post
         $this->connection = $connection;
     }
 
-    public function findBy($field, $value)
+    /**
+     * find post by field and value
+     *
+     * @param string $field
+     * @param string $value
+     * @param boolean $all
+     * @return array|\App\Models\Post|null
+     */
+    public function findBy(string $field, string $value, bool $all = true)
     {
         $sql = "SELECT 
                     p.id, p.title, p.content, p.created_at, p.updated_at,
@@ -34,8 +42,13 @@ class Post
         $query = $this->connection->prepare($sql);
         $query->bindValue(':valueField', $value);
         $query->execute();
-        $postList = $query->fetchAll();
-        return !empty($postList) ? $this->postMapper($postList) : [];
+        $result = $all ? $query->fetchAll() : $query->fetch();
+
+        if (is_array($result)) {
+            return !empty($result) ? $this->postArrayMapper($result) : [];
+        }
+
+        return $result ? $this->postMapper($result) : null;
     }
 
     public function all(): array
@@ -52,7 +65,20 @@ class Post
 
         $query = $this->connection->query($sql);
         $postList = $query->fetchAll();
-        return !empty($postList) ? $this->postMapper($postList) : [];
+        return !empty($postList) ? $this->postArrayMapper($postList) : [];
+    }
+
+    private function postMapper(Object $post)
+    {
+        return new PostModel(
+            $post->title,
+            $post->content,
+            new User($post->author_name, $post->author_email, $post->author_password, $post->author_id),
+            new Category($post->cat_description, null, $post->cat_id),
+            $post->id,
+            new DateTimeImmutable($post->created_at),
+            new DateTimeImmutable($post->updated_at),
+        );
     }
 
     /**
@@ -61,31 +87,23 @@ class Post
      * @param array $postList
      * @return array
      */
-    private function postMapper(array $postList)
+    private function postArrayMapper(array $postList): array
     {
-        return array_map(function ($p) {
-            return new PostModel(
-                $p->title,
-                $p->content,
-                new User($p->author_name, $p->author_email, $p->author_password, $p->author_id),
-                new Category($p->cat_description, null, $p->cat_id),
-                $p->id,
-                new DateTimeImmutable($p->created_at),
-                new DateTimeImmutable($p->updated_at),
-            );
+        return array_map(function ($post) {
+            return $this->postMapper($post);
         }, $postList);
     }
 
     public function save(PostModel $post): PostModel
     {
         $sql = "INSERT INTO posts(title, content, author, category_id, created_at)
-                VALUES(:title, :content, :author, category_id, NOW());";
+                VALUES(:title, :content, :author, :category, NOW());";
 
         $query = $this->connection->prepare($sql);
         $query->bindValue(':title', $post->title());
         $query->bindValue(':content', $post->content());
         $query->bindValue(':author', $post->author()->id());
-        $query->bindValue(':category_id', $post->category()->id());
+        $query->bindValue(':category', $post->category()->id());
         $query->execute();
 
         return new PostModel(
