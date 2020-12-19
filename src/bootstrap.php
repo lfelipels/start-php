@@ -1,6 +1,8 @@
 <?php
 
-use Slim\Factory\AppFactory;
+use App\Core\App;
+use App\Core\Http\Request;
+use App\Core\Http\Router;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -10,13 +12,10 @@ error_reporting(E_ALL);
 
 //configs
 
-$app = AppFactory::create();
-
 //create routes
+$router = new Router();
 include __DIR__ . '/../routes/admin.php';
 
 //start app
+$app = new App(new Request, $router);
 $app->run();
-
-
-
