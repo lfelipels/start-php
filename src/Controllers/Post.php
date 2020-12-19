@@ -2,17 +2,14 @@
 
 namespace App\Controllers;
 
-use App\Models\User as UserModel;
-use Slim\Psr7\Request;
 use App\Controllers\Base;
-use App\Core\Database\Connection;
 use App\Helpers\Redirect;
-use App\Models\Post as PostModel;
-use Psr\Http\Message\ResponseInterface;
-use App\Repositories\Post as PostRepository;
-use App\Repositories\Category as CategoryRepository;
-use App\Repositories\User as UserRepository;
+use App\Core\Http\Request;
 use App\Services\PublishPost;
+use App\Core\Database\Connection;
+use App\Repositories\Post as PostRepository;
+use App\Repositories\User as UserRepository;
+use App\Repositories\Category as CategoryRepository;
 
 class Post extends Base
 {
@@ -34,16 +31,16 @@ class Post extends Base
 
     public function index()
     {
-        $this->view->render('post.index', [
+        return $this->view->render('post.index', [
             'posts' => $this->postRepository->findBy('p.author', $this->userAuth->id()),
             'categories' => $this->categoryRepository->all()
         ]);
     }
 
-    public function store(Request $request, ResponseInterface $response)
+    public function store(Request $request)
     {
         try {
-            $postData = (object) $request->getParsedBody();
+            $postData = (object) $request->getBody();
             $postData->user = $this->userAuth;
             $publishPostService = new PublishPost(
                 $this->postRepository,
@@ -55,6 +52,5 @@ class Post extends Base
         } catch (\Throwable $th) {
             throw $th;
         }
-        die();
     }
 }
