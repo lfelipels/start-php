@@ -10,6 +10,16 @@
 </head>
 
 <body>
+
+    <section>
+        <?php
+        $flash = new App\Core\Session\FlashMessage;
+        if ($flash->has('success')) {
+            echo $flash->get('message');
+        }
+        ?>
+    </section>
+
     <!-- form-post -->
     <section class="post">
         <form action="/admin/posts" class="post__form" method="POST">
@@ -25,7 +35,7 @@
                 <select name="category" id="category">
                     <option value="">Selecione uma categoria</option>
                     <?php foreach ($categories as $category) : ?>
-                        <option value="<?= $category->id() ?>"> <?= $category->description()?></option>
+                        <option value="<?= $category->id() ?>"> <?= $category->description() ?></option>
                     <?php endforeach ?>
                 </select>
             </label>

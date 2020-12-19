@@ -7,6 +7,7 @@ use App\Helpers\Redirect;
 use App\Core\Http\Request;
 use App\Services\PublishPost;
 use App\Core\Database\Connection;
+use App\Core\Session\FlashMessage;
 use App\Repositories\Post as PostRepository;
 use App\Repositories\User as UserRepository;
 use App\Repositories\Category as CategoryRepository;
@@ -18,6 +19,7 @@ class Post extends Base
     private $categoryRepository;
     private $userRepository;
     private $userAuth;
+    private $flashMessage;
 
 
     public function __construct()
@@ -27,6 +29,7 @@ class Post extends Base
         $this->categoryRepository = new CategoryRepository(Connection::getInstance());
         $this->userRepository = new UserRepository(Connection::getInstance());
         $this->userAuth = $this->userRepository->findBy('id', 1, false);
+        $this->flashMessage = new FlashMessage();
     }
 
     public function index()
@@ -48,9 +51,17 @@ class Post extends Base
                 $this->userRepository,
             );
             $publishPostService->publish($postData);
+            $this->flashMessage->set('success', true);
+            $this->flashMessage->set('message', 'Post publicado com sucesso!');
             Redirect::to('/admin/posts');
-        } catch (\Throwable $th) {
-            throw $th;
+        } catch (\DomainException|\InvalidArgumentException $e) {
+            $this->flashMessage->set('success', false);
+            $this->flashMessage->set('message', $e->getMessage());
+            Redirect::to('/admin/posts');
+        } catch (\Exception $e) {
+            $this->flashMessage->set('success', false);
+            $this->flashMessage->set('message', 'Não foi possivel publicar o post');
+            Redirect::to('/admin/posts');
         }
     }
 }
