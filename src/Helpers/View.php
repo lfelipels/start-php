@@ -26,7 +26,6 @@ class View
             extract($data);
         }
         include $pathView;
-        die();
     }
 
 
