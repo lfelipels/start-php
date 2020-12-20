@@ -6,6 +6,7 @@ use App\Core\Http\RequestInterface;
 use App\Core\Http\Route;
 use App\Core\Http\RouterInterface;
 use App\Core\Http\Traits\WithRouteURI;
+use App\Core\Session\Session;
 use Exception;
 
 class App
@@ -16,6 +17,9 @@ class App
     /** Properts */
     private $router;
     private $request;
+    private $session;
+
+    private static $app;
 
     /**
      * Class constructor.
@@ -24,6 +28,8 @@ class App
     {
         $this->request = $request;
         $this->router = $router;
+        $this->session = Session::make();
+        self::$app = $this;
     }
 
     private function resolveRoute()
@@ -42,6 +48,16 @@ class App
         }
         
         echo call_user_func($callback, $this->request, $this->paramsURI);
+    }
+
+    public function session(): Session
+    {
+        return $this->session;
+    }
+
+    public static function instance()
+    {
+        return self::$app;
     }
 
     public function run()
