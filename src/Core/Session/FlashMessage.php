@@ -9,7 +9,7 @@ class FlashMessage
 
     public function __construct()
     {
-        $this->session = Session::make();
+        $this->session = session();
         if (!$this->session->has(self::FLASSH_KEY)) {
             $this->session->set(self::FLASSH_KEY, []);
         }
@@ -20,11 +20,11 @@ class FlashMessage
         return $this->session->get(self::FLASSH_KEY);
     }
 
-    public function set(string $key, string $message): void
+    public function set(string $key, $value): void
     {
         $this->session->set(self::FLASSH_KEY, array_merge(
             $this->getFlashes(),
-            [$key => $message]
+            [$key => $value]
         ));
     }
     
