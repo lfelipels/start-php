@@ -51,8 +51,8 @@
 
     <!-- list-post -->
     <section class="mx-3 mt-3">
-        <h3>Minhas postagens</h3>
-        <?php if (empty($posts)) : ?>
+        <h3>Minhas postagens (<?= $posts->count() ?>) </h3>
+        <?php if ($posts->isEmpty()) : ?>
             <div class="card">
                 Você ainda não criou nenhuma postagem. Crie agora mesmo.
             </div>
