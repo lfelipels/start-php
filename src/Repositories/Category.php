@@ -2,12 +2,17 @@
 
 namespace App\Repositories;
 
+use App\Core\Collection\CollectionInterface;
+use App\Core\Collection\Colletion;
 use PDO;
 use App\Models\Category as CategoryModel;
 use DateTimeImmutable;
 
 class Category
 {
+
+    use WithModelMapper;
+
     private PDO $connection;
 
     public function __construct(PDO $connection)
@@ -21,7 +26,7 @@ class Category
      * @param string $field
      * @param string $value
      * @param boolean $all
-     * @return array|\App\Models\Category|null
+     * @return CollectionInterface|\App\Models\Category|null
      */
     public function findBy(string $field, string $value, bool $all = true)
     {
@@ -32,41 +37,28 @@ class Category
         $result = $all ? $query->fetchAll() : $query->fetch();
 
         if (is_array($result)) {
-            return !empty($result) ? $this->categoryArrayMapper($result) : [];
+            return !empty($result) ? $this->mapFromArray($result) : [];
         }
 
-        return $result ? $this->categoryMapper($result) : null;
+        return $result ? $this->mapModel($result) : null;
     }
 
-    public function all(): array
+    public function all(): CollectionInterface
     {
         $sql = "SELECT * FROM categories WHERE deleted_at IS NULL;";
         $query = $this->connection->query($sql);
         $categoryList = $query->fetchAll();
-        return !empty($categoryList) ? $this->categoryArrayMapper($categoryList) : [];
+        return !empty($categoryList) ? $this->mapFromArray($categoryList) : [];
     }
 
-    /**
-     * Mapper Category Entity
-     *
-     * @param array $categoryList
-     * @return array
-     */
-    private function categoryMapper($category)
+    protected function mapModel($data): CategoryModel
     {
         return new CategoryModel(
-            $category->description,
+            $data->description,
             null,
-            $category->id,
-            new \DateTimeImmutable($category->created_at),
-            new \DateTimeImmutable($category->updated_at)
+            $data->id,
+            new \DateTimeImmutable($data->created_at),
+            new \DateTimeImmutable($data->updated_at)
         );
-    }
-    
-    private function categoryArrayMapper(array $categoryList)
-    {
-        return array_map(function ($category) {
-            return $this->categoryMapper($category);
-        }, $categoryList);
     }
 }

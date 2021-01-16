@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Core\Collection\CollectionInterface;
 use PDO;
 use App\Models\Post as PostModel;
 use App\Models\Category;
@@ -10,6 +11,8 @@ use DateTimeImmutable;
 
 class Post
 {
+    use WithModelMapper;
+
     private PDO $connection;
 
     public function __construct(PDO $connection)
@@ -23,7 +26,7 @@ class Post
      * @param string $field
      * @param string $value
      * @param boolean $all
-     * @return array|\App\Models\Post|null
+     * @return CollectionInterface|\App\Models\Post|null
      */
     public function findBy(string $field, string $value, bool $all = true)
     {
@@ -45,13 +48,13 @@ class Post
         $result = $all ? $query->fetchAll() : $query->fetch();
 
         if (is_array($result)) {
-            return !empty($result) ? $this->postArrayMapper($result) : [];
+            return !empty($result) ? $this->mapFromArray($result) : [];
         }
 
-        return $result ? $this->postMapper($result) : null;
+        return $result ? $this->mapModel($result) : null;
     }
 
-    public function all(): array
+    public function all(): CollectionInterface
     {
         $sql = "SELECT 
                     p.id, p.title, p.content, p.created_at, p.updated_at,
@@ -65,33 +68,20 @@ class Post
 
         $query = $this->connection->query($sql);
         $postList = $query->fetchAll();
-        return !empty($postList) ? $this->postArrayMapper($postList) : [];
+        return !empty($postList) ? $this->mapFromArray($postList) : [];
     }
 
-    private function postMapper(Object $post)
+    protected function mapModel($data): PostModel
     {
         return new PostModel(
-            $post->title,
-            $post->content,
-            new User($post->author_name, $post->author_email, $post->author_password, $post->author_id),
-            new Category($post->cat_description, null, $post->cat_id),
-            $post->id,
-            new DateTimeImmutable($post->created_at),
-            new DateTimeImmutable($post->updated_at),
+            $data->title,
+            $data->content,
+            new User($data->author_name, $data->author_email, $data->author_password, $data->author_id),
+            new Category($data->cat_description, null, $data->cat_id),
+            $data->id,
+            new DateTimeImmutable($data->created_at),
+            new DateTimeImmutable($data->updated_at),
         );
-    }
-
-    /**
-     * Mapper Post Entity
-     *
-     * @param array $postList
-     * @return array
-     */
-    private function postArrayMapper(array $postList): array
-    {
-        return array_map(function ($post) {
-            return $this->postMapper($post);
-        }, $postList);
     }
 
     public function save(PostModel $post): PostModel

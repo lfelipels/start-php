@@ -2,12 +2,15 @@
 
 namespace App\Repositories;
 
+use App\Core\Collection\CollectionInterface;
 use PDO;
 use App\Models\User as UserModel;
 use DateTimeImmutable;
 
 class User
 {
+    use WithModelMapper;
+
     private PDO $connection;
 
     public function __construct(PDO $connection)
@@ -24,18 +27,18 @@ class User
         $result = $all ? $query->fetchAll() : $query->fetch();
 
         if (is_array($result)) {
-            return !empty($result) ? $this->userArrayMapper($result) : [];
+            return !empty($result) ? $this->mapFromArray($result) : [];
         }
 
-        return $result ? $this->userMapper($result) : null;
+        return $result ? $this->mapModel($result) : null;
     }
 
-    public function all(): array
+    public function all(): CollectionInterface
     {
         $sql = "SELECT * FROM users WHERE deleted_at IS NULL;";
         $query = $this->connection->query($sql);
         $userList = $query->fetchAll();
-        return !empty($userList) ? $this->userArrayMapper($userList) : [];
+        return !empty($userList) ? $this->mapFromArray($userList) : [];
     }
 
     /**
@@ -44,7 +47,7 @@ class User
      * @param array $userList
      * @return UserModel
      */
-    private function userMapper($user): UserModel
+    protected function mapModel($user): UserModel
     {
         return new UserModel(
             $user->name,
@@ -54,12 +57,5 @@ class User
             new \DateTimeImmutable($user->created_at),
             new \DateTimeImmutable($user->updated_at)
         );
-    }
-    
-    private function userArrayMapper(array $userList): array
-    {
-        return array_map(function ($user) {
-            return $this->userMapper($user);
-        }, $userList);
     }
 }
