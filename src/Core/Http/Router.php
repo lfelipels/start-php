@@ -64,7 +64,7 @@ class Router implements RouterInterface
     {
         $hasMethod = $this->routes[$route->method()] ?? false;
         if(!empty($this->routes) && $hasMethod !== false){
-            $exists = array_filter($this->routes[$route->method], fn($r) => $this->checkRouteURI($r->uri(), $route->uri()));
+            $exists = array_filter($this->routes[$route->method()], fn($r) => $this->checkRouteURI($r->uri(), $route->uri()));
             if(!empty($exists)){
                 throw new \InvalidArgumentException("Route {$route->uri()} already exists");
             }
