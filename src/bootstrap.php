@@ -13,6 +13,8 @@ ini_set('display_startup_errors', 'ON');
 error_reporting(E_ALL);
 
 //configs
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..', '.env');
+$dotenv->load();
 
 //create routes
 $router = new Router();

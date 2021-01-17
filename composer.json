@@ -23,6 +23,7 @@
 	"minimum-stability": "dev",
 	"require": {
 		"slim/slim": "^4.0",
-		"slim/psr7": "9999999-dev"
+		"slim/psr7": "9999999-dev",
+		"vlucas/phpdotenv": "5.2.x-dev"
 	}
 }
