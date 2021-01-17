@@ -12,7 +12,8 @@
 		]
 	},
 	"require-dev": {
-		"phpunit/phpunit": "10.0.x-dev"
+		"phpunit/phpunit": "10.0.x-dev",
+		"fzaninotto/faker": "1.9.x-dev"
 	},
 	"authors": [
 		{
@@ -24,6 +25,7 @@
 	"require": {
 		"slim/slim": "^4.0",
 		"slim/psr7": "9999999-dev",
-		"vlucas/phpdotenv": "5.2.x-dev"
+		"vlucas/phpdotenv": "5.2.x-dev",
+		"robmorgan/phinx": "9999999-dev"
 	}
 }
