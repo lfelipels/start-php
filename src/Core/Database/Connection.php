@@ -26,6 +26,32 @@ class Connection implements ConnectionInterface
         if(!self::$connection){
             try {
                 $config = self::getConfig($connectionName);
+                self::$connection = self::make($config);
+                self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                self::$connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+            } catch (\Throwable $th) {
+                throw new DatabaseConnectionException('Connection database failed');
+            }
+        }
+        
+        return self::$connection;
+    }
+
+    public static function make(array $config): PDO
+    {
+
+        switch ($config['driver']) {
+            case 'sqlite':
+                $dns = sprintf("%s:%s", $config['driver'], $config['database']);
+                var_dump($dns);
+                return new PDO(
+                    $dns, "","",array(
+                        PDO::ATTR_PERSISTENT => true
+                    )
+                );
+                break;
+            
+            default:
                 $dns = sprintf(
                     '%s:host=%s;dbname=%s;port=%s',
                     $config['driver'],
@@ -33,21 +59,9 @@ class Connection implements ConnectionInterface
                     $config['database'],
                     $config['port']
                 );
-
-                self::$connection = new PDO(
-                    $dns,
-                    $config['username'],
-                    $config['password'],
-                    [
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ
-                    ]
-                );
-            } catch (\Throwable $th) {
-                throw new DatabaseConnectionException('Connection database failed');
-            }
-        }
         
-        return self::$connection;
+                return new PDO($dns, $config['username'], $config['password']);
+                break;
+        }        
     }
 }
