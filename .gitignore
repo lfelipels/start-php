@@ -1,3 +1,7 @@
 /vendor/
 /.vscode/
 .phpunit.*
+.env
+/database/*.sqlite
+/storage/*
+!storage/.gitkeep
