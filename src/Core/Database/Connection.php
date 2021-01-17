@@ -6,13 +6,17 @@ use PDO;
 use App\Core\Database\ConnectionInterface;
 use App\Core\Exception\DatabaseConnectionException;
 use App\Helpers\Config;
+use App\Helpers\Env;
+
 class Connection implements ConnectionInterface
 {
     private static $connection;
 
     private static function getConfig(?string $connectionName = null): array
     {
-        $connectionName ??= Config::get('database.default');
+        $default = Env::get('DB_CONNECTION') ?? Config::get('database.default');
+        $connectionName ??= $default;
+
         try {
             $config = Config::get("database.connections.{$connectionName}");
             return $config;
@@ -43,7 +47,6 @@ class Connection implements ConnectionInterface
         switch ($config['driver']) {
             case 'sqlite':
                 $dns = sprintf("%s:%s", $config['driver'], $config['database']);
-                var_dump($dns);
                 return new PDO(
                     $dns, "","",array(
                         PDO::ATTR_PERSISTENT => true
