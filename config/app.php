@@ -1,7 +1,9 @@
 <?php
 
+use App\Helpers\Env;
+
 return [
-    'env' => 'local', //local, testing, production
-    'debug' => true, //
-    'url' => 'http://localhost'
+    'env' => Env::get('APP_ENV', 'local'), //local, testing, production
+    'debug' => Env::get('APP_DEBUG', true), //
+    'url' => Env::get('APP_URL', 'http://localhost')
 ];
