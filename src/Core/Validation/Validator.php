@@ -31,18 +31,13 @@ class Validator
     public function validate()
     {
         $rulesAvaliable = $this->rulesAvaliable();
-        var_dump($this->inputs);
 
         foreach ($this->inputs as $inputName => $value) {
             $inputsRules = $this->rules[$inputName] ?? [];
 
             foreach($inputsRules as $rule){
                 $rule = strtolower($rule);
-                //required ok
-                //max:100 ok 
-                //between:data1,data1 
-                //equals:pass
-
+                
                 try {
                     if (strpos($rule, ':') !== false) {
                         $explodeRule = explode(':', $rule);
@@ -80,12 +75,6 @@ class Validator
     public function errors(): array
     {
         return $this->errors;
-
-        // [
-        //     'input' => [
-        //         'rule' => 'menssage'
-        //     ]
-        // ]
     }
 
     private function rulesAvaliable()
