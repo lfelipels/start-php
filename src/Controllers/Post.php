@@ -43,21 +43,25 @@ class Post extends Base
         try {
 
             $validator = Validator::make($request->getBody(), [
-                'title' => ['between:2020-10-10,2020-10-20']
+                'title' => ['required', 'max:100', ''],
+                'content' => ['required']
             ], [
                 'title' => [
                     'required' => "O campo Título é de preenchimento obrigatório",
-                    'max' => "O campo Título naõ deve ter mais de 10 caracteres",
-                    'equals' => "O campo titulo deve ser igual ao texto",
-                    'between' => "O valor do campo titulo deve ser um valor entre 10 e 20"
+                    'max' => "O campo Título naõ deve ter mais de 100 caracteres",
+                ],
+                'content' => [
+                    'required' => "É obrigatório escrever o artigo",
                 ]
             ]);
 
-
             $validator->validate();
 
-            dd($validator->errors());
-
+            if($validator->fails()){
+                Redirect::withErrors($validator->errors())
+                        ->back();
+            }
+            //sabe post
             $postData = (object) $request->getBody();
             $postData->user = $this->userAuth;
             $publishPostService = new PublishPost(
