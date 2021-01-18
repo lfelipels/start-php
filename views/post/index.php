@@ -13,6 +13,21 @@
 
 <body>
 
+    <?php
+    $flass = (new App\Core\Session\FlashMessage);
+    $errors = $flass->get('errors') ?? null;
+    if ($errors) :
+    ?>
+        <div class="alert alert-danger" role="alert">
+            <p>
+                Verifique as seguites informações:
+            </p>
+            <?php foreach ($errors->all() as $error) : ?>
+                <li><?= $error ?></li>
+            <?php endforeach ?>
+        </div>
+    <?php endif ?>
+
     <!-- form-post -->
     <section class="mx-3">
         <form action="/admin/posts" class="col-md-4" method="POST">
@@ -34,7 +49,15 @@
             </div>
             <div class="mb-2">
                 <label for="title">Título</label>
-                <input type="text" name="title" id="title" class="form-control">
+                <input type="text" 
+                        name="title" 
+                        id="title" 
+                        class="form-control <?= ($errors && $errors->has('title')) ? 'border border-danger' : '' ?>">
+                <?php if ($errors && $errors->has('title')) : ?>
+                    <div class="text-danger">
+                        <?= $errors->first('title') ?>
+                    </div>
+                <?php endif ?>
             </div>
 
             <div class="mb-2">
