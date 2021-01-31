@@ -5,8 +5,8 @@ namespace App\Core\Database;
 use PDO;
 use App\Core\Database\ConnectionInterface;
 use App\Core\Exception\DatabaseConnectionException;
-use App\Helpers\Config;
-use App\Helpers\Env;
+use App\Core\Helpers\Config;
+use App\Core\Helpers\Env;
 
 class Connection implements ConnectionInterface
 {

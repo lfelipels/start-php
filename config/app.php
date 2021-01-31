@@ -1,6 +1,6 @@
 <?php
 
-use App\Helpers\Env;
+use App\Core\Helpers\Env;
 
 return [
     'env' => Env::get('APP_ENV', 'local'), //local, testing, production

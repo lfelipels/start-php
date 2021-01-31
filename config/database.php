@@ -1,7 +1,7 @@
 <?php
 
-use App\Helpers\Env;
-use App\Helpers\Path;
+use App\Core\Helpers\Env;
+use App\Core\Helpers\Path;
 
 return [
     'default' => 'pgsql',

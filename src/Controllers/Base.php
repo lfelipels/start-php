@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Helpers\View;
+use App\Core\Helpers\View;
 
 abstract class Base
 {
